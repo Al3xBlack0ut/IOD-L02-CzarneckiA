@@ -28,44 +28,76 @@ jobs:
     - name: Run tests
       run: mvn test
     
-    - name: Send email notification on failure
+    - name: Create Issue and notify team on failure
       if: failure()
-      uses: dawidd6/action-send-mail@v3
+      uses: actions/github-script@v7
       with:
-        server_address: smtp. gmail.com
-        server_port: 587
-        username: ${{secrets.EMAIL_USERNAME}}
-        password: ${{secrets.EMAIL_PASSWORD}}
-        subject: "Build Failed - ${{github.repository}}"
-        body: |
-          Build nie powiódł się! 
+        script: |
+          const issue = await github.rest.issues. create({
+            owner: context. repo. owner,
+            repo: context. repo.repo,
+            title: 'CI Build Failed - ' + context.sha.substring(0, 7),
+            body: `## Build nie powiódł się! 
+            
+            **Branch:** \`${context.ref}\`  
+            **Commit:** \`${context.sha}\`  
+            **Autor:** @${context.actor}  
+            **Data:** ${new Date().toLocaleString('pl-PL')}
+            
+            ### Szczegóły:
+            - **Repository:** ${context.repo.owner}/${context.repo.repo}
+            - **Workflow:** ${context.workflow}
+            - **Job:** ${context.job}
+            
+            ### Zobacz logi:
+            [Kliknij tutaj aby zobaczyć pełne logi](${context.serverUrl}/${context.repo.owner}/${context. repo.repo}/actions/runs/${context.runId})
+            
+            ### Powiadomiono:
+            - @Al3xBlack0ut
+            - @abzediusz
+            - @PiotrRem
+            
+            ---
+            *Issue utworzony automatycznie przez GitHub Actions CI*
+            *Wszyscy przypisani członkowie otrzymają email z powiadomieniem*`,
+            labels: ['bug', 'ci-failure', 'high-priority'],
+            assignees: [
+              'Al3xBlack0ut',
+              'abzediusz',
+              'PiotrRem'
+            ]
+          });
           
-          Repozytorium: ${{github.repository}}
-          Branch: ${{github.ref}}
-          Commit: ${{github.sha}}
-          Autor: ${{github.actor}}
-          
-          Zobacz szczegóły: ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}
-        to: ${{secrets.EMAIL_TO}}
-        from: GitHub Actions CI
+          console.log('Issue utworzony:', issue.data.html_url);
+          console.log('Email wysłany do przypisanych osób');
     
-    - name: Send email notification on success
+    - name: Close failure issues on success
       if: success()
-      uses: dawidd6/action-send-mail@v3
+      uses: actions/github-script@v7
       with:
-        server_address: smtp. gmail.com
-        server_port: 587
-        username: ${{secrets.EMAIL_USERNAME}}
-        password: ${{secrets.EMAIL_PASSWORD}}
-        subject: "Build Successful - ${{github.repository}}"
-        body: |
-          Build zakończył się sukcesem! 
+        script: |
+          const issues = await github.rest. issues. listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: 'ci-failure'
+          });
           
-          Repozytorium: ${{github.repository}}
-          Branch: ${{github. ref}}
-          Commit: ${{github.sha}}
-          Autor: ${{github.actor}}
-          
-          Zobacz szczegóły: ${{github.server_url}}/${{github.repository}}/actions/runs/${{github. run_id}}
-        to: ${{secrets.EMAIL_TO}}
-        from: GitHub Actions CI
+          for (const issue of issues. data) {
+            await github. rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: ` **Build został naprawiony! **\n\n**Commit:** \`${context.sha}\`\n**Autor:** @${context.actor}\n\n[Zobacz workflow](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
+            });
+            
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              state: 'closed',
+              state_reason: 'completed'
+            });
+            
+            console.log(' Zamknięto Issue:', issue.number);
+          }
