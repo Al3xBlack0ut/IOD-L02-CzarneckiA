@@ -5,6 +5,7 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -31,7 +32,7 @@ jobs:
       if: failure()
       uses: dawidd6/action-send-mail@v3
       with:
-        server_address: smtp.gmail.com
+        server_address: smtp. gmail.com
         server_port: 587
         username: ${{secrets.EMAIL_USERNAME}}
         password: ${{secrets.EMAIL_PASSWORD}}
@@ -52,19 +53,19 @@ jobs:
       if: success()
       uses: dawidd6/action-send-mail@v3
       with:
-        server_address: smtp.gmail.com
+        server_address: smtp. gmail.com
         server_port: 587
         username: ${{secrets.EMAIL_USERNAME}}
         password: ${{secrets.EMAIL_PASSWORD}}
         subject: "Build Successful - ${{github.repository}}"
         body: |
-          Build zakończył się sukcesem!
+          Build zakończył się sukcesem! 
           
           Repozytorium: ${{github.repository}}
-          Branch: ${{github.ref}}
+          Branch: ${{github. ref}}
           Commit: ${{github.sha}}
           Autor: ${{github.actor}}
           
-          Zobacz szczegóły: ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}
+          Zobacz szczegóły: ${{github.server_url}}/${{github.repository}}/actions/runs/${{github. run_id}}
         to: ${{secrets.EMAIL_TO}}
         from: GitHub Actions CI
