@@ -1,29 +1,29 @@
-package pl.put.poznan.transformer.rest;
+package pl.put.poznan.BuildingInfo.rest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
-import pl.put.poznan.transformer.logic.TextTransformer;
+import pl.put.poznan.BuildingInfo.logic.BuildingInfo;
 
 import java.util.Arrays;
 
 
 @RestController
 @RequestMapping("/{text}")
-public class TextTransformerController {
+public class BuildingInfoController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TextTransformerController.class);
+    private static final Logger logger = LoggerFactory.getLogger(BuildingInfoController.class);
 
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-    public String get(@PathVariable String text,
-                              @RequestParam(value="transforms", defaultValue="upper,escape") String[] transforms) {
+    public String get(@PathVariable String object,
+                              @RequestParam(value="operacje") String[] transforms) {
 
         // log the parameters
-        logger.debug(text);
+        logger.debug(object);
         logger.debug(Arrays.toString(transforms));
 
         // perform the transformation, you should run your logic here, below is just a silly example
-        TextTransformer transformer = new TextTransformer(transforms);
-        return transformer.transform(text);
+        BuildingInfo transformer = new BuildingInfo(transforms);
+        return transformer.transform(object);
     }
 
     @RequestMapping(method = RequestMethod.POST, produces = "application/json")
@@ -35,7 +35,7 @@ public class TextTransformerController {
         logger.debug(Arrays.toString(transforms));
 
         // perform the transformation, you should run your logic here, below is just a silly example
-        TextTransformer transformer = new TextTransformer(transforms);
+        BuildingInfo transformer = new BuildingInfo(transforms);
         return transformer.transform(text);
     }
 
