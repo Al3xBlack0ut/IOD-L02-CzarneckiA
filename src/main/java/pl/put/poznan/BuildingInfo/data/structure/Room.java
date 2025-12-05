@@ -1,10 +1,15 @@
 package pl.put.poznan.BuildingInfo.data.structure;
 
+/**
+ * Room - klasa dziedzicząca po Location. Występuje w polu children obiektów Floor.
+ *
+ * @author PiotrRem
+ */
 public class Room extends Location {
-    float area;
-    float cube;
-    float heating;
-    float light;
+    float area; // powierzchnia w m^2
+    float cube; // kubatura w m^3
+    float heating; // poziom zużycia energii ogrzewania
+    float light; // łączna moc oświetlenia
 
 
     Room(int id, String name) {
