@@ -2,6 +2,7 @@ package pl.put.poznan.transformer.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import pl.put.poznan.transformer.data.structure.LocationController;
 
 
 @SpringBootApplication(scanBasePackages = {"pl.put.poznan.transformer.rest"})
