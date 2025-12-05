@@ -1,9 +1,9 @@
-package pl.put.poznan.transformer.data.structure;
+package pl.put.poznan.BuildingInfo.data.structure;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pl.put.poznan.BuildingInfo.data.structure.LocationController;
 
 import static org.junit.jupiter.api.Assertions.*;
 

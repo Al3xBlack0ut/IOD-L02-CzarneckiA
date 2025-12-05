@@ -1,4 +1,4 @@
-package pl.put.poznan.transformer.data.structure;
+package pl.put.poznan.BuildingInfo.data.structure;
 
 public class Room extends Location {
     float area;
