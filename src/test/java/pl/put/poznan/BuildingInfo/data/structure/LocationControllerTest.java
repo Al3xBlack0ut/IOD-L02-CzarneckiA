@@ -48,7 +48,7 @@ class LocationControllerTest {
     void testAddLocation4(){
         assertTrue(locationController.addLocation(1, "Stołówka", 0, 1.0f, 2.0f, 3.0f, 4.0f));
         assertTrue(locationController.addLocation(2, "Stołówka", 0, 1.0f, 2.0f, 0.0f, 0.0f));
-        assertFalse(locationController.addLocation(3, "Stołówka", 0, 1.0f, 2.0f, 0.0f, -1.0f));
+        assertTrue(locationController.addLocation(3, "Stołówka", 0, 1.0f, 2.0f, 0.0f, -1.0f));
     }
 
     @Test

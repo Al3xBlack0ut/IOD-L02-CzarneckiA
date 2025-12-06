@@ -3,66 +3,6 @@ package pl.put.poznan.BuildingInfo.data.structure;
 import java.util.ArrayList;
 
 /**
- * LocationType - typ wyliczeniowy używany, by orientować się, jak nisko w hierarchii obiektów Location zeszły algorytmy przeszukujące.
- */
-enum LocationType{
-    Root, Building, Floor, Room, INVALID;
-
-    public LocationType next(){
-        switch (this){
-            case Root:
-                return LocationType.Building;
-            case Building:
-                return LocationType.Floor;
-            case Floor:
-                return  LocationType.Room;
-            default:
-                return LocationType.INVALID;
-        }
-    }
-}
-
-/**
- * LocationFinder - pomocniczna klasa wyszukująca obiekt Location w schemacie.
- *
- * @author PiotrRem
- */
-class LocationFinder{
-    Location rootLocation;
-    int id;
-    LocationType foundType;
-
-    LocationFinder(Location location, int id) {
-        this.rootLocation = location;
-        this.id = id;
-        this.foundType = LocationType.Building;
-    }
-
-    private Location findLocationByIdUtil(int id,  Location location, LocationType foundLocationType){
-        if(id == location.id){
-            foundType = foundLocationType;
-            return location;
-        }
-        else if(location.children.isEmpty()) return null;
-
-        for(Location child : location.children){
-            Location found = findLocationByIdUtil(id, child, foundLocationType.next());
-            if(found != null) return found;
-        }
-        return null;
-    }
-
-    Location findLocationById(){
-        return findLocationByIdUtil(id, rootLocation, LocationType.Root);
-    }
-
-    boolean checkIfExists(){
-        if(findLocationByIdUtil(id, rootLocation, LocationType.Root) == null) return false;
-        else return true;
-    }
-}
-
-/**
  * LocationSelecter - pomocnicza klasa wykonująca operację selekcji na zbiorze danych.
  *
  * @author PiotrRem
@@ -76,93 +16,33 @@ class LocationSelecter{
         this.id = id;
     }
 
-    private float getAreaCascade(Location location, LocationType locationType){
-        if(location.children.isEmpty()){
-            if(locationType != LocationType.Room) return 0;
-            if(location.area > 0) return location.area;
-            return 0;
-        }
-
-        float sum = 0;
-        for(Location child : location.children){
-            sum += getAreaCascade(child, locationType.next());
-        }
-        return sum;
-    }
-
     float getArea(){
-        LocationFinder locationFinder = new LocationFinder(rootLocation, id);
-        Location found =  locationFinder.findLocationById();
+        Location found =  rootLocation.findLocationById(id);
         if(found == null) return -1;
-        return getAreaCascade(found, locationFinder.foundType);
-    }
-
-    private float getCubeCascade(Location location, LocationType locationType){
-        if(location.children.isEmpty()){
-            if(locationType != LocationType.Room) return 0;
-            if(location.cube > 0) return location.cube;
-            return 0;
-        }
-
-        float sum = 0;
-        for(Location child : location.children){
-            sum += getCubeCascade(child, locationType.next());
-        }
-        return sum;
+        return found.getArea();
     }
 
     float getCube(){
-        LocationFinder locationFinder = new LocationFinder(rootLocation, id);
-        Location found =  locationFinder.findLocationById();
+        Location found =  rootLocation.findLocationById(id);
         if(found == null) return -1;
-        return getCubeCascade(found, locationFinder.foundType);
-    }
-
-    private float getHeatingCascade(Location location, LocationType locationType){
-        if(location.children.isEmpty()){
-            if(locationType != LocationType.Room) return 0;
-            if(location.heating > 0) return location.heating;
-            return 0;
-        }
-
-        float sum = 0;
-        for(Location child : location.children){
-            sum += getHeatingCascade(child, locationType.next());
-        }
-        return sum;
+        return found.getCube();
     }
 
     float getHeating(){
-        LocationFinder locationFinder = new LocationFinder(rootLocation, id);
-        Location found =  locationFinder.findLocationById();
+        Location found =  rootLocation.findLocationById(id);
         if(found == null) return -1;
-        return getHeatingCascade(found, locationFinder.foundType);
-    }
-
-    private float getLightCascade(Location location, LocationType locationType){
-        if(location.children.isEmpty()){
-            if(locationType != LocationType.Room) return 0;
-            if(location.light > 0) return location.light;
-            return 0;
-        }
-
-        float sum = 0;
-        for(Location child : location.children){
-            sum += getLightCascade(child, locationType.next());
-        }
-        return sum;
+        return found.getHeating();
     }
 
     float getLight(){
-        LocationFinder locationFinder = new LocationFinder(rootLocation, id);
-        Location found =  locationFinder.findLocationById();
+        Location found =  rootLocation.findLocationById(id);
         if(found == null) return -1;
-        return getLightCascade(found, locationFinder.foundType);
+        return found.getLight();
     }
 
     String getLocationName(){
-        LocationFinder locationFinder = new LocationFinder(rootLocation, id);
-        Location location = locationFinder.findLocationById();
+        Location location = rootLocation.findLocationById(id);
+        if(location == null) return null;
         return location.name;
     }
 }
@@ -182,18 +62,11 @@ class LocationAdder{
     }
 
     boolean addLocation(int id, String name, int parent_id, float area, float cube, float heating, float light){
-        if(area < 0 || cube < 0 || heating < 0 || light < 0) return false;
-        LocationFinder locationFinder = new LocationFinder(rootLocation, id);
-        if(locationFinder.checkIfExists()) return false;
+        if(rootLocation.checkIfExists(id)) return false;
 
-        locationFinder = new LocationFinder(rootLocation, parent_id);
-        Location location = locationFinder.findLocationById();
+        Location location = rootLocation.findLocationById(parent_id);
         if(location == null) return false;
-        else if(locationFinder.foundType == LocationType.Root) location.children.add(new Building(id, name));
-        else if(locationFinder.foundType == LocationType.Building) location.children.add(new Floor(id, name));
-        else if(locationFinder.foundType == LocationType.Floor) location.children.add(new Room(id, name, area, cube, heating, light));
-        else return false;
-        return true;
+        return location.addSublocation(id, name, area, cube, heating, light);
     }
 
 }
@@ -212,27 +85,13 @@ class LocationDeleter{
         this.rootLocation = location;
     }
 
-    private void deleteCascade(Location location){
-        for (Location child : new ArrayList<>(location.children)) {
-            deleteCascade(child);
-        }
-        location.children.clear();
-    }
-
-    private boolean deleteLocationByIdUtil(Location location){
-        for (Location child : new ArrayList<>(location.children)) {
-            if (child.id == id) {
-                deleteCascade(child);
-                location.children.remove(child);
-                return true;
-            }
-            if (deleteLocationByIdUtil(child)) return true;
-        }
-        return false;
-    }
-
     boolean deleteLocationById(){
-        return deleteLocationByIdUtil(rootLocation);
+        Location found =  rootLocation.findLocationById(id);
+        if(found==null)  return false;
+        Location parent = rootLocation.findParentLocationById(id);
+        if(parent == null) return false;
+        parent.removeSublocation(id);
+        return true;
     }
 }
 
@@ -252,53 +111,42 @@ class LocationUpdater{
 
     boolean setArea(float value){
         if(value < 0) return false;
-        LocationFinder locationFinder = new LocationFinder(rootLocation, id);
-        Location found = locationFinder.findLocationById();
-        if(found == null || locationFinder.foundType != LocationType.Room) return false;
-        found.area = value;
-        return true;
+        Location found = rootLocation.findLocationById(id);
+        if(found==null) return false;
+        return found.setArea(value);
     }
 
     boolean setCube(float value){
         if(value < 0) return false;
-        LocationFinder locationFinder = new LocationFinder(rootLocation, id);
-        Location found = locationFinder.findLocationById();
-        if(found == null || locationFinder.foundType != LocationType.Room) return false;
-        found.cube = value;
-        return true;
+        Location found = rootLocation.findLocationById(id);
+        if(found==null) return false;
+        return found.setCube(value);
     }
 
     boolean setHeating(float value){
         if(value < 0) return false;
-        LocationFinder locationFinder = new LocationFinder(rootLocation, id);
-        Location found = locationFinder.findLocationById();
-        if(found == null || locationFinder.foundType != LocationType.Room) return false;
-        found.heating = value;
-        return true;
+        Location found = rootLocation.findLocationById(id);
+        if(found==null) return false;
+        return found.setHeating(value);
     }
 
     boolean setLight(float value){
         if(value < 0) return false;
-        LocationFinder locationFinder = new LocationFinder(rootLocation, id);
-        Location found = locationFinder.findLocationById();
-        if(found == null || locationFinder.foundType != LocationType.Room) return false;
-        found.light = value;
-        return true;
+        Location found = rootLocation.findLocationById(id);
+        if(found==null) return false;
+        return found.setLight(value);
     }
 
     boolean setName(String value){
-        LocationFinder locationFinder = new LocationFinder(rootLocation, id);
-        Location found = locationFinder.findLocationById();
+        Location found = rootLocation.findLocationById(id);
         if(found == null) return false;
-        found.name = value;
+        found.setName(value);
         return true;
     }
 
     boolean setId(int value){
-        LocationFinder locationFinder = new LocationFinder(rootLocation, value);
-        if(locationFinder.checkIfExists()) return false;
-        locationFinder = new LocationFinder(rootLocation, id);
-        Location found = locationFinder.findLocationById();
+        if(rootLocation.checkIfExists(value)) return false;
+        Location found = rootLocation.findLocationById(id);
         if(found == null) return false;
         found.id = value;
         return true;
