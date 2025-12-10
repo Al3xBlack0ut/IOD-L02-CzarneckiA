@@ -39,8 +39,8 @@ public class Location {
     protected float heating;                             // poziom zużycia energii ogrzewania
     protected float light;                               // łączna moc oświetlenia
 
-    Location() {this.children = new HashSet<>(); this.type = LocationType.Root;}
-    Location(int id, String name){this.id = id;this.name = name; this.children = new HashSet<>();this.type = LocationType.Root;}
+    public Location() {this.children = new HashSet<>(); this.type = LocationType.Root;}
+    public Location(int id, String name){this.id = id;this.name = name; this.children = new HashSet<>();this.type = LocationType.Root;}
 
     protected Location findLocationByIdUtil(int sought_id,  Location location){
         if(sought_id == location.id){
@@ -96,19 +96,19 @@ public class Location {
         this.name = name;
     }
 
-    boolean setArea(float area){
+    public boolean setArea(float area){
         if(type!=LocationType.Room) return false;
         this.area = area;
         return true;
     }
 
-    boolean setCube(float cube){
+    public boolean setCube(float cube){
         if(type!=LocationType.Room) return false;
         this.cube = cube;
         return true;
     }
 
-    boolean setHeating(float heating){
+    public boolean setHeating(float heating){
         if(type!=LocationType.Room) return false;
         this.heating = heating;
         return true;
@@ -163,23 +163,33 @@ public class Location {
         }
     }
 
-    float getArea(){
+    public float getArea(){
         Map<String, Float> stats = getSublocationStatsCascade(this);
         return  stats.get("area");
     }
 
-    float getCube(){
+    public float getCube(){
         Map<String, Float> stats = getSublocationStatsCascade(this);
         return  stats.get("cube");
     }
 
-    float getHeating(){
+    public float getHeating(){
         Map<String, Float> stats = getSublocationStatsCascade(this);
         return  stats.get("heating");
     }
 
-    float getLight(){
+    public float getLight(){
         Map<String, Float> stats = getSublocationStatsCascade(this);
         return  stats.get("light");
+    }
+    public float getLightperM2(){
+        return this.getLight()/this.getArea();
+    }
+    public float getHeatingperM3(){
+        return this.getHeating()/this.getCube();
+    }
+    public int getId()
+    {
+        return id;
     }
 }

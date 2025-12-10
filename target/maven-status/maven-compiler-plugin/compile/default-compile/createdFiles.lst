@@ -1,3 +1,10 @@
-pl/put/poznan/transformer/app/TextTransformerApplication.class
-pl/put/poznan/transformer/rest/TextTransformerController.class
-pl/put/poznan/transformer/logic/TextTransformer.class
+pl\put\poznan\BuildingInfo\data\structure\LocationSelecter.class
+pl\put\poznan\BuildingInfo\data\structure\Location$LocationType.class
+pl\put\poznan\BuildingInfo\data\structure\Building.class
+pl\put\poznan\BuildingInfo\data\structure\LocationAdder.class
+pl\put\poznan\BuildingInfo\data\structure\Location.class
+pl\put\poznan\BuildingInfo\data\structure\Floor.class
+pl\put\poznan\BuildingInfo\data\structure\Room.class
+pl\put\poznan\BuildingInfo\data\structure\LocationUpdater.class
+pl\put\poznan\BuildingInfo\data\structure\LocationDeleter.class
+pl\put\poznan\BuildingInfo\data\structure\LocationController.class
