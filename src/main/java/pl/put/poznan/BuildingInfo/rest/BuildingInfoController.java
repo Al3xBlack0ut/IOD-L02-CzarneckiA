@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import pl.put.poznan.BuildingInfo.logic.BuildingInfo;
 import pl.put.poznan.BuildingInfo.data.structure.Location;
+import pl.put.poznan.BuildingInfo.data.structure.LocationController;
 import java.util.Arrays;
 import java.util.ArrayList;
 
@@ -30,16 +31,16 @@ public class BuildingInfoController {
 
     @RequestMapping(method = RequestMethod.POST, consumes="application/json",produces = "application/json")
     public void post(@PathVariable int id,
-                      @RequestBody Location [] locations) {
+                      @RequestParam LocationController location,@RequestParam int ParentId) {
 
         // log the parameters
         logger.debug(Integer.toString(id));
-        //logger.debug(Arrays.toString(transforms));
+        logger.debug(Integer.toString(ParentId));
 
         // perform the transformation, you should run your logic here, below is just a silly example
         //BuildingInfo transformer = new BuildingInfo(id);
         //return transformer.transform("Asd");
-        baza.insert(locations);
+        baza.insert(id,ParentId,location);
     }
 
 

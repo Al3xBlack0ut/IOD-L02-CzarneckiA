@@ -1,5 +1,5 @@
 package pl.put.poznan.BuildingInfo.logic;
-import pl.put.poznan.BuildingInfo.data.structure.Location;
+import pl.put.poznan.BuildingInfo.data.structure.LocationController;
 import java.util.ArrayList;
 /**
  * This is just an example to show that the logic should be outside the REST service.
@@ -7,41 +7,40 @@ import java.util.ArrayList;
 public class BuildingInfo {
 
     //private final String[] transforms;
-    private ArrayList<Location> lokacje=new ArrayList<Location>();
+    private LocationController lokacje=new LocationController();
     private int id;
     public BuildingInfo(){
         //this.id = id;
     }
-    public void insert(Location [] locations)
+    public void insert(int id,int ParentId,LocationController location)
     {
-        for(Location i:locations)
+        if(ParentId!=-1)
+            lokacje.addLocation(id,location.getName(id),ParentId,location.getArea(id),location.getCube(id),location.getLight(id),location.getHeating(id));
+        else
         {
-            lokacje.add(i);
+            lokacje.addLocation(id,location.getName(id));
+            lokacje.setArea(id, location.getArea(id));
+            lokacje.setCube(id, location.getCube(id));
+            lokacje.setLight(id, location.getLight(id));
+            lokacje.setHeating(id, location.getHeating(id));
         }
+
     }
     public float transform(int id,String polecenie){
         float wynik;
-        Location przetwarzany=new Location();
-        for(Location i:lokacje)
-        {
-            if(i.getId()==id)
-            {
-                przetwarzany=i;
-                break;
-            }
-        }
+
 
             if(polecenie=="getArea") {
-                wynik = przetwarzany.getArea();
+                wynik = lokacje.getArea(id);
             }
             else if(polecenie=="getCube"){
-                wynik = przetwarzany.getCube();
+                wynik = lokacje.getCube(id);
             }
             else if(polecenie=="getLight"){
-                wynik = przetwarzany.getLight();
+                wynik = lokacje.getLight(id);
             }
             else{
-                wynik = przetwarzany.getHeating();
+                wynik = lokacje.getHeating(id);
             }
         return wynik;
     }
