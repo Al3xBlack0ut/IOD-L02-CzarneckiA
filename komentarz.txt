@@ -1,0 +1,16 @@
+1.
+Średni czas odpowiedzi i przepustowość dla kodu bazowego:
+- Średni czas odpowiedzi: 1.7 ms
+- Przepustowość: 2.1 /s
+
+W kodzie bazowym metoda averageSpendings() była wywoływana w każdej iteracji pętli, co powodowało wielokrotne, niepotrzebne przeliczanie średniej wydatków (pełne przejście po wszystkich klientach dla każdego klienta). Po modyfikacji średnia jest liczona tylko raz przed pętlą i wykorzystywana w warunku, co znacząco poprawia wydajność.
+
+Średni czas odpowiedzi i przepustowość dla kodu po modyfikacji:
+- Średni czas odpowiedzi: 1.3 ms
+- Przepustowość: 22.2 /s
+
+2.
+Przepustowość: 6.8 kart/sekundę
+
+Rekomendowana liczba drukarek: 10
+Przy 10 drukarkach osiągana przepustowość to 6.8 kart/sekundę (24 480 kart/godzinę), co przekracza wymagane 5.5 kart/sekundę (20 000 kart/godzinę). Zakładana przez analityków konfiguracja jest wystarczająca i zapewnia zapas wydajności.
